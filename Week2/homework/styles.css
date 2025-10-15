@@ -1,0 +1,36 @@
+body {
+    background-color: bisque;
+    padding-left: 5%;
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.intro {
+    display: flex;
+}
+
+.words {
+    display: flex;
+    margin: 5%;
+    flex-direction: column;
+    justify-content: space-evenly;
+    font-style: italic;
+}
+
+#name {
+    color: darkslategrey;
+    font-style: normal;
+    font-family:'Times New Roman', Times, serif;
+}
+
+#pfp {
+    border-radius: 50% 75%;
+    padding-top: 5%;
+    justify-content: flex-start;
+}
+
+.education {
+    background-color: antiquewhite;
+    padding: 1% 2% 1% 1%;
+    margin-top: 2%;
+    border-style: dotted;
+}
