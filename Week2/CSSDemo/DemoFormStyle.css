@@ -1,53 +1,3 @@
-<<<<<<< HEAD
-* {
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    margin: 0%;
-}
-
-h1 {
-    color: darkblue;
-    font-size: 90px;
-    text-align: center;
-    margin-top: 20px;
-}
-
-input {
-    /* margin-left: 10%; */
-    padding-left: 10%;
-    border-radius: 5px;
-    border: 1px solid black;
-}
-
-#basic-inputs {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 2%;
-}
-
-.gender-option {
-    margin-left: 10%;
-}
-
-button {
-    margin-top: 0%;
-    border-radius: 2px;
-    padding: 2% 1%;
-
-    text-transform: uppercase;
-    font-weight: bold;
-
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
-
-    cursor: pointer;
-
-    transition: background-color 0.5s ease;
-}
-
-button:hover {
-    background-color: blue;
-}
-=======
 /* Preface: HTML was updated with some classNames and IDs. Use the HTML file inside the week 2 folder. */
 /* First step: Add <link> tag inside the HTML file */
 
@@ -176,4 +126,3 @@ button {
 button:hover {
   background-color: rgb(169, 235, 255);
 }
->>>>>>> upstream/main

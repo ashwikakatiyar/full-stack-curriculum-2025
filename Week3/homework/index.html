@@ -23,7 +23,7 @@
 
 <script>
 		// USE YOUR OWN API KEY
-		const apiKey = "";
+		const apiKey = "2f8efe8461a5200a50d483564799e02c";
 
         // variable that stores the city that is chosen
 		let city;
@@ -103,6 +103,24 @@
 			//printing the city object to the console
 			console.log(city);
             // BEGIN CODING HERE
+			getWeatherData(lat, lon);
+			getAQI(lat, lon);
+		}
+
+		async function getWeatherData(lat, lon) {
+
+			let weatherApiCall = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&units=metric&appid=${apiKey}`;
+			let weatherResponse = await fetch(weatherApiCall);
+			let weatherData = await weatherResponse.json();
+			
+			console.log(weatherData);
+		}
+
+		async function getAQI(lat, lon) {
+			let aqiApiCall = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+			let aqiResponse = await fetch(aqiApiCall);
+			let aqiData = await aqiResponse.json();
+
 		}
 	</script>
 </html>
