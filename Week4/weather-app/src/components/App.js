@@ -4,7 +4,11 @@ import '../styles/App.css'; // Import the CSS file for App
 import MainContainer from './MainContainer';
 import SideContainer from './SideContainer';
 
+<<<<<<< HEAD
 const apiKey = '2f8efe8461a5200a50d483564799e02c'; // Your OpenWeatherMap API key here
+=======
+const apiKey = '6dc87f0d902ad7e89bffc74e3ba537ef'; // Your OpenWeatherMap API key here
+>>>>>>> upstream/main
 
 function App() {
   /*
@@ -16,9 +20,12 @@ function App() {
   Use the 'useState' hook to create a state variable (e.g., 'selectedCity') and its corresponding setter 
   function (e.g., 'setSelectedCity'). The initial state can be an empty object or null.
   */
+<<<<<<< HEAD
 
   const [selectedCity, setSelectedCity] = useState(null);
   
+=======
+>>>>>>> upstream/main
   
   
   /*
@@ -28,9 +35,12 @@ function App() {
   that takes city data as its argument and uses the setter function from the 'useState' hook to update the 
   state of the selected city. This function will be passed to SideContainer as a prop.
   */
+<<<<<<< HEAD
    const selectNewCity = (cityData) => {
     setSelectedCity(cityData);
   };
+=======
+>>>>>>> upstream/main
   
   
   return (
@@ -46,9 +56,13 @@ function App() {
       */}
       
       <MainContainer apiKey={apiKey} /* Pass the selected city data as props to 'MainContainer' */ />
+<<<<<<< HEAD
       <MainContainer selectedCity={selectedCity} />
       <SideContainer apiKey={apiKey} /* Pass the city data update function as a prop to 'SideContainer' */ />
       <SideContainer setSelectedCity={selectNewCity}/>
+=======
+      <SideContainer apiKey={apiKey} /* Pass the city data update function as a prop to 'SideContainer' */ />
+>>>>>>> upstream/main
     </div>
   );
 }
