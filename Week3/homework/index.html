@@ -103,17 +103,62 @@
 			//printing the city object to the console
 			console.log(city);
             // BEGIN CODING HERE
-			getWeatherData(lat, lon);
+			getWeatherData(lat, lon, name, state);
 			getAQI(lat, lon);
 		}
 
-		async function getWeatherData(lat, lon) {
+		async function getWeatherData(lat, lon, cityName, state) {
 
 			let weatherApiCall = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&units=metric&appid=${apiKey}`;
 			let weatherResponse = await fetch(weatherApiCall);
 			let weatherData = await weatherResponse.json();
 			
-			console.log(weatherData);
+			console.log('Weather data: ', weatherData);
+			displayCurrentWeather(weatherData.current, cityName, state);
+			displayForecase(data.daily);
+		}
+
+		function displayCurrentWeather(current, cityName, state) {
+            document.getElementById('cityName').textContent = `${cityName}, ${state}`;
+            document.getElementById('temperature').textContent = `${Math.round(current.temp)}°C`;
+            document.getElementById('weatherDescription').textContent = current.weather[0].description;
+            document.getElementById('feelsLike').textContent = `${Math.round(current.feels_like)}°C`;
+            document.getElementById('humidity').textContent = `${current.humidity}%`;
+            document.getElementById('windSpeed').textContent = `${current.wind_speed} m/s`;
+            document.getElementById('pressure').textContent = `${current.pressure} hPa`;
+            
+            const iconCode = current.weather[0].icon;
+            document.getElementById('weatherIcon').src = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
+            document.getElementById('weatherIcon').alt = current.weather[0].description;
+            
+            currentWeather.classList.add('active');
+        }
+
+		function displayForecast(daily) {
+            const forecastCards = document.getElementById('forecastCards');
+            forecastCards.innerHTML = '';
+            
+            // Display next 5 days (skip today, index 0)
+            for (let i = 1; i <= 5; i++) {
+                const day = daily[i];
+                const date = new Date(day.dt * 1000);
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                
+                const card = document.createElement('div');
+                card.className = 'forecast-card';
+                
+                const iconCode = day.weather[0].icon;
+                
+                card.innerHTML = `
+                    <div class="forecast-date">${dayName}</div>
+                    <img class="forecast-icon" src="https://openweathermap.org/img/wn/${iconCode}@2x.png" alt="${day.weather[0].description}">
+                    <div class="forecast-temp">${Math.round(day.temp.day)}°C</div>
+                    <div class="forecast-description">${day.weather[0].description}</div>
+                    <div class="forecast-minmax">H: ${Math.round(day.temp.max)}° L: ${Math.round(day.temp.min)}°</div>
+                `;
+                
+                forecastCards.appendChild(card);
+            }
 		}
 
 		async function getAQI(lat, lon) {
@@ -121,6 +166,31 @@
 			let aqiResponse = await fetch(aqiApiCall);
 			let aqiData = await aqiResponse.json();
 
+			console.log('Air Quality data: ', aqiData);
+			if (data.list && data.list.length > 0) {
+                const aqi = data.list[0].main.aqi;
+                displayAirQuality(aqi);
+            }		
 		}
+
+		function displayAirQuality(aqi) {
+            const aqiValue = document.getElementById('aqiValue');
+            const aqiDescription = document.getElementById('aqiDescription');
+            
+            const aqiLevels = {
+                1: { text: 'Good', class: 'aqi-good', desc: 'Air quality is satisfactory' },
+                2: { text: 'Fair', class: 'aqi-fair', desc: 'Air quality is acceptable' },
+                3: { text: 'Moderate', class: 'aqi-moderate', desc: 'Sensitive individuals should limit outdoor activity' },
+                4: { text: 'Poor', class: 'aqi-poor', desc: 'Everyone may experience health effects' },
+                5: { text: 'Very Poor', class: 'aqi-very-poor', desc: 'Health alert: everyone may experience serious effects' }
+            };
+            
+            const level = aqiLevels[aqi] || aqiLevels[1];
+            
+            aqiValue.textContent = level.text;
+            aqiValue.className = `aqi-value ${level.class}`;
+            aqiDescription.textContent = ` - ${level.desc}`;
+        }
+		
 	</script>
 </html>
