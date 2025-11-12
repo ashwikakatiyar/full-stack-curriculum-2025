@@ -8,6 +8,7 @@ import {
   Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useAuth } from "../contexts/AuthContext";
 //import { useAuth } from "../contexts/AuthContext";
 
 function LoginPage() {
@@ -15,6 +16,7 @@ function LoginPage() {
   const theme = useTheme();
 
   // TODO: Extract login function and error from our authentication context.
+const {loginError, login} = useAuth()
 
   // State to hold the username and password entered by the user.
   const [username, setUsername] = useState("");

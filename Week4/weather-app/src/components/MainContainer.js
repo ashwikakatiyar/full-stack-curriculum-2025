@@ -29,6 +29,7 @@ function MainContainer(props) {
   null or an empty object.
   */
   
+  const [forecast, setForecast] = useState(null);
   
   /*
   STEP 3: Fetch Weather Data When City Changes.
@@ -43,7 +44,24 @@ function MainContainer(props) {
   After fetching the data, use the 'setWeather' function from the 'useState' hook to set the weather data 
   in your state.
   */
-  
+  const { apiKey, selectedCity } = props;
+
+  useEffect(() => {
+    const fetchForecastData = () => {
+      const apiCall = `https://api.openweathermap.org/data/2.5/forecast?lat=${selectedCity.lat}&lon=${selectedCity.lon}&appid=${apiKey}&units=imperial`;
+      
+      fetch(apiCall)
+        .then((response) => response.json())
+        .then((data) => {
+          setForecast(data);
+        })
+    };
+    
+    if (selectedCity && selectedCity.lat && selectedCity.lon) {
+      setForecast(null);
+      fetchForecastData();
+    }
+  }, [selectedCity, apiKey]); 
   
   return (
     <div id="main-container">
@@ -58,12 +76,56 @@ function MainContainer(props) {
         Break down the data object and figure out what you want to display (e.g., temperature, weather description).
         This is a good section to play around with React components! Create your own - a good example could be a WeatherCard
         component that takes in props, and displays data for each day of the week.
-        */}
+        */
+        }
+        <p>{formatDate(0)}</p>
+        <h1>Weather for {selectedCity != null && selectedCity.fullName}</h1>
+        {forecast && 
+          <div id="current-weather">
+            <div id="current-weather-text">
+              <p>{forecast.list[0].weather[0].main}</p>
+              <p>{forecast.list[0].weather[0].description}</p>
+              <h1>{Math.round(forecast.list[0].main.temp)}°</h1>
+            </div>
+            <div id="current-weather-icon">
+              <img 
+                src={require(`../icons/${forecast.list[0].weather[0].icon}.svg`)} 
+                alt="weather icon" 
+                width="20%"
+              />
+            </div>
+          </div>
+        }
+        {forecast &&
+          forecast.list
+          .filter((item, index) =>
+            index % 8 === 0
+          )
+          .slice(0, 5)
+          .map((item, index) => (
+            <div id="forecast-weather">
+              {WeatherCard(index + 1)}
+            </div>
+          ))
+        }
       </div>
     </div>
   );
-}
 
+  function WeatherCard(daysFromNow) {
+    return (
+      <div>
+        <p id="forecast-day">{formatDate(daysFromNow)}</p>
+        <img 
+          src={require(`../icons/${forecast.list[daysFromNow].weather[0].icon}.svg`)} 
+          alt="weather icon" 
+          width="20%"
+        />
+        <p>{Math.round(forecast.list[daysFromNow].main.temp_max)}° to {Math.round(forecast.list[daysFromNow].main.temp_min)}°</p>
+      </div>
+    )
+  }
+}
 
 export default MainContainer;
 

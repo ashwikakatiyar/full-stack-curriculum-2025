@@ -11,3 +11,23 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+#weather-container {
+  font-size: large;
+  font-weight: bold;
+}
+
+#current-weather {
+  display: flex;
+  flex-direction: row;
+}
+
+#forecast-weather {
+  display: flex;
+  flex-direction: row;
+}
+
+#forecast-day {
+  background-color: aliceblue;
+}
+

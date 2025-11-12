@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import "../styles/SideContainer.css"; // Import the CSS file for SideContainer
 
 function SideContainer(props) {
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+
   // We are using the same search() and renderSearchResults() given to you from the previous HW!
   function search() {
     // takes the value from the search input
@@ -16,6 +19,7 @@ function SideContainer(props) {
           response.json()
         )
         .then((data) => {
+          setSearchResults(data);
           // after recieving the converted JSON data, pass the JSON to the renderSearchResults() function
           renderSearchResults(data);
         });
@@ -96,12 +100,20 @@ function SideContainer(props) {
       lon: lon,
     };
     console.log(city);
+    props.setSelectedCity(city);
+    setSearchResults([]);
+    setSearchInput("");
   }
 
   return (
     <div id="side-container">
       <div>
-        <input id="search-input" placeholder="search for a city"></input>
+        <input 
+          id="search-input" 
+          placeholder="search for a city"
+          value = {searchInput}
+          onChange = {(e) =>
+            setSearchInput(e.target.value)}></input>
         <button id="search-button" onClick={search}>
           search
         </button>
