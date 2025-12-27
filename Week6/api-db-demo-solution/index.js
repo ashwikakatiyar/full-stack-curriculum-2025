@@ -9,23 +9,18 @@ require('dotenv').config();
 const app = express();
 const db = require('./firebase'); // Your Firebase config file
 
-var pbkdf2 = require('pbkdf2')
-const jwt = require('jsonwebtoken')
-ACCESS_TOKEN_SECRET = "abc123"
-const SALT = "aklsdjflaksdjflka339q31"
-
 // Middleware to parse JSON
 app.use(express.json());
 
 // Middleware to validate tweet length
-const validateTweetLength = (req, res, next) => {
-     const tweet = req.body.tweet;
-     if (tweet && tweet.length <= 100) {
-         next();
-     } else {
-         res.status(400).json({ error: 'Tweet is too long (max 100 characters).' });
-     }
- };
+// const validateTweetLength = (req, res, next) => {
+//     const tweet = req.body.tweet;
+//     if (tweet && tweet.length <= 100) {
+//         next();
+//     } else {
+//         res.status(400).json({ error: 'Tweet is too long (max 100 characters).' });
+//     }
+// };
 
 // Middleware to validate input of post request
 const validateInput = (req, res, next) => {
@@ -36,8 +31,6 @@ const validateInput = (req, res, next) => {
         res.status(400).json({ error: 'Incomplete input' });
     }
 };
-
-
 
 // Root route
 app.get('/', (req, res) => {
@@ -92,56 +85,6 @@ app.delete('/api/tweets/:id', async (req, res) => {
         res.json({ id, ...tweetSnapshot.data() });
     }
 });
-
-const hashPassword = (password) => {
-    const key = pbkdf2.pbkdf2Sync(password, SALT, 1000, 64, 'sha512');
-    return key.toString('hex');
-}
-
-app.post("/register", async (req, res) => {
-    const { username, password } = req.body;
-    const passHashed = hashPassword(password);
-
-    const check = await db.collection("users").where("username", "==", username).get();
-    if(!check.empty) {
-        return res.status(400).json({ msg: "user exists"});
-    }
-
-    const user = {
-        username: username,
-        password: password
-    }
-
-    const userRef = await await db.collection("users").add(newTweet);
-    const accessToken = jwt.sign(
-        {username: username},
-        ACCESS_TOKEN_SECRET,
-        {expiresIn: "30s"},
-    );
-    res.json({ data: {username: username}, token: accessToken});
-})
-
-app.post("/login", async (req, res) => {
-     const { username, password } = req.body;
-    const passHashed = hashPassword(password);
-
-    const check = await db.collection("users").where("username", "==", username).get();
-    if(!check.empty) {
-        return res.status(400).json({ msg: "user doesn't exist"});
-    }
-
-    const user = check.data();
-    if (passHashed === user.password) {
-        const accessToken = jwt.sign(
-        {username: username},
-        ACCESS_TOKEN_SECRET,
-        {expiresIn: "30s"},
-        );
-        res.json({ data: {username: username}, token: accessToken});
-    } else {
-        return res.status(401).json({ msg: "username or password was incorrect"});
-    }
-})
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}`));
