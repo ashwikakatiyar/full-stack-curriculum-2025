@@ -16,7 +16,7 @@ export const useAuth = () => {
 export function AuthProvider({ children }) {
     const navigate = useNavigate();
     
-    const [currentUser, setCurrentUser] = useState[localStorage.getItem("username")];
+    const [currentUser, setCurrentUser] = useState(localStorage.getItem("username")); 
     const [loginError, setLoginError] = useState(null);
 
     const VALID_USERNAME = "ashwika"
@@ -24,10 +24,10 @@ export function AuthProvider({ children }) {
 
     // Login function that validates the provided username and password.
     const login = (username, password) => {
-        if(username === VALID_USERNAME && password === VALID_PASSWORD){
-            setCurrentUser(username)
-            localStorage.setItem('username', username);
-            navigate('/')
+        if(username === VALID_USERNAME && password === VALID_PASSWORD) {
+            setCurrentUser(username);
+            localStorage.setItem("username", username);
+            navigate('/');
         } else {
             setLoginError("ERROR: FAILED TO LOGIN")
         }
@@ -35,9 +35,9 @@ export function AuthProvider({ children }) {
 
     // Logout function to clear user data and redirect to the login page.
     const logout = () => {
-        setCurrentUser(null)
-        localStorage.removeItem("username")
-        navigate("/login")
+        setCurrentUser(null);
+        localStorage.removeItem("username");
+        navigate('/login');
     };
 
     // An object containing our state and functions related to authentication.
