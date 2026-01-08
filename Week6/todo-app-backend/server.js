@@ -119,13 +119,7 @@ app.delete("/tasks/:id", async (req, res) => {
 
 // Setting the port for the server to listen on
 const PORT = process.env.PORT || 3001;
-
-// Start server (Vercel will handle this in production)
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`);
-  });
-}
-
-// Export for Vercel
-module.exports = app;
+// Starting the server
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+});
