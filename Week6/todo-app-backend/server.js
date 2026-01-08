@@ -28,24 +28,18 @@ app.use(express.json()); // Parse JSON body
 
 // Firebase Admin Authentication Middleware
 const auth = (req, res, next) => {
-  console.log("AUTH HEADER:", req.get("Authorization"));
-
-  const authHeader = req.get("Authorization");
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(400).send("Invalid token");
+  try {
+    const tokenId = req.get("Authorization").split("Bearer ")[1];
+    admin.auth().verifyIdToken(tokenId)
+      .then((decoded) => {
+        req.token = decoded;
+        next();
+      })
+      .catch((error) => res.status(401).send(error));
+  } catch (error) {
+    res.status(400).send("Invalid token");
   }
-
-  const tokenId = authHeader.split("Bearer ")[1];
-
-  admin.auth().verifyIdToken(tokenId)
-    .then((decoded) => {
-      req.token = decoded;
-      next();
-    })
-    .catch(() => res.status(400).send("Invalid token"));
 };
-
 
 
 
