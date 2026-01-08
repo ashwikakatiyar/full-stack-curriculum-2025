@@ -30,24 +30,31 @@ export default function HomePage() {
   // to fetch the list of tasks instead of using the hardcoded data.
 
   useEffect(() => {
-        if (!currentUser) {
-            navigate("/login");
-        } else {
-            const userId = currentUser.uid;
-            currentUser.getIdToken().then((token) => {
-                fetch(`${process.env.REACT_APP_BACKEND}/tasks/${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                    .then((response) => response.json())
-                    .then((data) => setTaskList(data))
-                    .catch((error) =>
-                        console.error("Error fetching tasks:", error)
-                    );
-            });
-        }
-    }, [currentUser]);
+  if (!currentUser) {
+    navigate("/login");
+    return;
+  }
+
+  const fetchTasks = async () => {
+    try {
+      const userId = currentUser.email ? currentUser.email.split('@')[0] : currentUser.uid;
+      const token = await currentUser.getIdToken();
+      console.log("Sending token:", token); // optional for debugging
+
+      const res = await fetch(`${process.env.REACT_APP_BACKEND}/tasks/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+      setTaskList(data);
+    } catch (err) {
+      console.error("Error fetching tasks:", err);
+    }
+  };
+
+  fetchTasks();
+}, [currentUser, navigate]);
+
 
     // TODO: Support retrieving your todo list from the API.
     // Currently, the tasks are hardcoded. You'll need to make an API call
