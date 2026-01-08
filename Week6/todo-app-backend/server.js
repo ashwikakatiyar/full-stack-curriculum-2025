@@ -14,7 +14,7 @@ require("dotenv").config();
 const db = require("./firebase");
 const corsOptions = {
   origin: [
-    'http://localhost:3000',  // Local development
+    'http://localhost:3001',  // Local development
     'https://todo-app-frontend-taupe.vercel.app',  // Your frontend URL
   ],
   credentials: true,
