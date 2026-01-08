@@ -1,16 +1,162 @@
 /* Add your styling for MainContainer component here */
-/* For example: */
 #main-container {
   height: 100%;
-  width: 66%;
+  width: 75%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  background-color: #87b7ff;
+  background: linear-gradient(180deg, #7eb3e8 0%, #a8cde8 100%);
+  padding: 60px 40px;
+  overflow-y: auto;
 }
 
 #weather-container {
-  height: 60%;
   width: 90%;
+  max-width: 1000px;
+  font-weight: bold;
+}
+
+.header-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 40px;
+}
+
+#weather-container > p:first-child {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+  margin-top: 0;
+}
+
+.location {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.current-weather {
+  gap: 20px;
+}
+
+.current-weather-show {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  align-items: center;
+  margin-bottom: 60px;
+}
+
+.current-weather-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.condition {
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0;
+  text-transform: lowercase;
+}
+
+.current-weather-details p:nth-child(2) {
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.temp {
+  font-size: 80px;
+  font-weight: 300;
+  margin: 0;
+  line-height: 1;
+}
+
+.aqi-display {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.current-weather-icon {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.forecast {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.forecast-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  height: 190px;
+  width: 125px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.forecast-card .day-forecast {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 15px;
+  margin-top: 0;
+  text-align: center;
+}
+
+.forecast-icon {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 15px;
+}
+
+.forecast-temp {
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+}
+
+.select-city-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 150px;
+  color: rgb(0, 1, 54);
+}
+
+.select-city-message h2 {
+  font-size: 48px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+}
+
+.select-city-message p {
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.9;
 }

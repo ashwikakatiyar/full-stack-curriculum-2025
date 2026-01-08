@@ -33,7 +33,7 @@ export default function HomePage() {
     if (!currentUser) {
       navigate("/login");
     } else {
-      fetch(`https://tpeo-todo.vercel.app.tasks/${currentUser}`)
+      fetch(`process.env.REACT_APP_BACKEND/tasks/${currentUser}`)
         .then((response) => response.json())
         .then((data) => {
           setTaskList(data);
@@ -52,7 +52,7 @@ export default function HomePage() {
       // In addition to updating the state directly, you should send a request
       // to the API to add a new task and then update the state based on the response.
       
-      fetch("https://tpeo-todo.vercel.app/tasks", {
+      fetch("process.env.REACT_APP_BACKEND/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -66,7 +66,7 @@ export default function HomePage() {
         .then((response ) => response.json())
         .then(data => {
           setTaskList([...taskList, data]);
-          setNewTaskName("");
+          setNewTaskName();
         })
         .catch(error => {
           console.error("FAILED TO POST: ", error)
@@ -78,11 +78,18 @@ export default function HomePage() {
 
   // Function to toggle the 'finished' status of a task.
   function toggleTaskCompletion(task) {
-    setTaskList(
-      taskList.map((t) =>
-        t.id === task.id ? { ...t, finished: !task.finished } : t
-      )
-    );
+    fetch(`process.env.REACT_APP_BACKEND/tasks/${task.id}`, {
+      method: "DELETE"
+  })
+    .then(response => response.json())
+    .then(() => {
+      const updatedTaskList = taskList.filter((existingTask) => existingTask.id !== task.id)
+
+      setTaskList(updatedTaskList)
+    })
+    .catch(error => {
+          console.error("FAILED TO DELETE: ", error)
+    })
 
     // TODO: Support removing/checking off todo items in your todo list through the API.
     // Similar to adding tasks, when checking off a task, you should send a request

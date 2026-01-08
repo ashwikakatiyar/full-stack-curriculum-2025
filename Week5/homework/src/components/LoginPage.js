@@ -6,6 +6,7 @@ import {
   Typography,
   Box,
   Alert,
+  Link,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useAuth } from "../contexts/AuthContext";
@@ -15,16 +16,28 @@ function LoginPage() {
   const theme = useTheme();
 
   // Extract login function and error from our authentication context.
-  const { loginError, login } = useAuth();
+  const { loginError, login, register } = useAuth();
 
   // State to hold the username and password entered by the user.
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const [registered, setRegistered] = useState(false);
+
   // TODO: Handle login function.
   const handleLogin = () => {
     login(username, password);
   };
+
+  const handleRegister = () => {
+    register(username, password);
+  }
+
+  const toggleRegister = () => {
+    setRegistered(!registered);
+    setUsername("");
+    setPassword("");
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -47,7 +60,7 @@ function LoginPage() {
           src="/longhorn.jpg"
         ></Box>
         <Typography component="h1" variant="h4" fontWeight="bold">
-          Login
+          {registered ? "Register" : "Login"}
         </Typography>
         <Box sx={{ mt: 1 }}>
           <TextField
@@ -58,7 +71,7 @@ function LoginPage() {
             id="username"
             label="Username"
             InputLabelProps={{ shrink: true }}
-            placeholder="admin"
+            placeholder="Enter your username"
             autoFocus
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -72,7 +85,7 @@ function LoginPage() {
             type="password"
             id="password"
             InputLabelProps={{ shrink: true }}
-            placeholder="racecar"
+            placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -82,10 +95,20 @@ function LoginPage() {
             variant="contained"
             color="primary"
             sx={{ mt: 3, mb: 2 }}
-            onClick={handleLogin}
+            onClick={registered ? handleRegister : handleLogin}
           >
-            Login
+            {registered ? "Register" : "Login"}
           </Button>
+          <Box sx={{ textAlign: "center" }}>
+            <Link
+              component="button"
+              variant="body2"
+              onClick={toggleRegister}
+              sx={{ cursor: "pointer" }}
+            >
+            {registered ? "Login to existing account" : "Register new account"}
+            </Link>
+            </Box>
         </Box>
         {/* Display Login Error if it exists */}
         {loginError && (
