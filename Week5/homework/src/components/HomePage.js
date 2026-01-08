@@ -52,25 +52,27 @@ export default function HomePage() {
       // In addition to updating the state directly, you should send a request
       // to the API to add a new task and then update the state based on the response.
       
+      const username = currentUser.email ? currentUser.email.split('@')[0] : currentUser.uid;
+    
       fetch(`${process.env.REACT_APP_BACKEND}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          user: currentUser,
+          user: username,  
           name: newTaskName,
           finished: false
         })
       })
-        .then((response ) => response.json())
-        .then(data => {
-          setTaskList([...taskList, data]);
-          setNewTaskName();
-        })
-        .catch(error => {
-          console.error("FAILED TO POST: ", error)
-        })
+      .then((response) => response.json())
+      .then(data => {
+        setTaskList([...taskList, data]);
+        setNewTaskName("");
+      })
+      .catch(error => {
+        console.error("FAILED TO POST: ", error);
+      });
     } else if (taskList.some((task) => task.name === newTaskName)) {
       alert("Task already exists!");
     }
