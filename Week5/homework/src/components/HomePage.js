@@ -30,65 +30,51 @@ export default function HomePage() {
   // to fetch the list of tasks instead of using the hardcoded data.
 
   useEffect(() => {
-        if (!currentUser) {
-            navigate("/login");
-        } else {
-            const userId = currentUser.email ? currentUser.email.split('@')[0] : currentUser.uid;
-            currentUser.getIdToken().then((token) => {
-                fetch(`${process.env.REACT_APP_BACKEND}/tasks/${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                    .then((response) => response.json())
-                    .then((data) => setTaskList(data))
-                    .catch((error) =>
-                        console.error("Error fetching tasks:", error)
-                    );
-            });
-        }
-    }, [currentUser]);
+      if (!currentUser) {
+          navigate("/login");
+      } else {
+          const userId = currentUser.email ? currentUser.email.split('@')[0] : currentUser.uid;
+          
+          fetch(`${process.env.REACT_APP_BACKEND}/tasks/${userId}`)
+              .then((response) => response.json())
+              .then((data) => setTaskList(data))
+              .catch((error) =>
+                  console.error("Error fetching tasks:", error)
+              );
+      }
+  }, [currentUser, navigate]);
 
     // TODO: Support retrieving your todo list from the API.
     // Currently, the tasks are hardcoded. You'll need to make an API call
     // to fetch the list of tasks instead of using the hardcoded data.
 
     function handleAddTask() {
-      // Check if task name is provided and if it doesn't already exist.
-      if (
-          newTaskName &&
-          !taskList.some((task) => task.name === newTaskName)
-      ) {
-          // TODO: Support adding todo items to your todo list through the API.
-          // In addition to updating the state directly, you should send a request
-          // to the API to add a new task and then update the state based on the response.
+      if (newTaskName && !taskList.some((task) => task.name === newTaskName)) {
           const userId = currentUser.email ? currentUser.email.split('@')[0] : currentUser.uid;
-          currentUser.getIdToken().then((token) => {
-              fetch(`${process.env.REACT_APP_BACKEND}/tasks`, {
-                  method: "POST",
-                  headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                  },
-                  body: JSON.stringify({
-                      user: userId,
-                      name: newTaskName,
-                      finished: false,
-                  }),
+          
+          fetch(`${process.env.REACT_APP_BACKEND}/tasks`, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  user: userId,
+                  name: newTaskName,
+                  finished: false,
+              }),
+          })
+              .then((response) => response.json())
+              .then((data) => {
+                  setTaskList([...taskList, data]);
+                  setNewTaskName("");
               })
-                  .then((response) => response.json())
-                  .then((data) => {
-                      setTaskList([...taskList, data]);
-                      setNewTaskName("");
-                  })
-                  .catch((error) =>
-                      console.error("Error adding task:", error)
-                  );
-          });
+              .catch((error) =>
+                  console.error("Error adding task:", error)
+              );
       } else if (taskList.some((task) => task.name === newTaskName)) {
           alert("Task already exists!");
       }
-    }
+  }
 
   // Function to toggle the 'finished' status of a task.
   function toggleTaskCompletion(task) {
