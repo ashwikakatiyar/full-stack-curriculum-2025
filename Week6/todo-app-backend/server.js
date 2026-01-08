@@ -9,12 +9,22 @@ const app = express();
 // Loading environment variables from a .env file into process.env
 require("dotenv").config();
 
+
 // Importing the Firestore database instance from firebase.js
 const db = require("./firebase");
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',  // Local development
+    'https://todo-app-frontend-taupe.vercel.app',  // Your frontend URL
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
 
-// Middlewares to handle cross-origin requests and to parse the body of incoming requests to JSON
-app.use(cors());
-app.use(bodyParser.json());
+
+//middleware
+app.use(cors(corsOptions));
+app.use(express.json()); // Parse JSON body
 
 // Firebase Admin Authentication Middleware
 const auth = (req, res, next) => {
@@ -80,6 +90,7 @@ app.get("/tasks/:user", auth, async (req, res) => {
       res.status(500).send(error.message);
     }
   });
+
 // POST: Endpoint to add a new task
 app.post("/tasks", async (req, res) => {
   try {
