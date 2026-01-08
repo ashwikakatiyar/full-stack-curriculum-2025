@@ -9,15 +9,24 @@ const app = express();
 // Loading environment variables from a .env file into process.env
 require("dotenv").config();
 
+
 // Importing the Firestore database instance from firebase.js
 const db = require("./firebase");
-const { admin } = require("./firebase");
+const corsOptions = {
+  origin: [
+    'http://localhost:3001',  // Local development
+    'https://todo-app-frontend-taupe.vercel.app',  // Your frontend URL
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
 
-// Middlewares to handle cross-origin requests and to parse the body of incoming requests to JSON
-app.use(cors());
-app.use(bodyParser.json());
 
-// Your API routes will go here...
+//middleware
+app.use(cors(corsOptions));
+app.use(express.json()); // Parse JSON body
+
+// Firebase Admin Authentication Middleware
 const auth = (req, res, next) => {
   try {
     const tokenId = req.get("Authorization").split("Bearer ")[1];
@@ -32,6 +41,9 @@ const auth = (req, res, next) => {
   }
 };
 
+
+
+// Your API routes will go here...
 
 // GET: Endpoint to retrieve all tasks
 app.get("/tasks", async (req, res) => {
@@ -57,70 +69,66 @@ app.get("/tasks", async (req, res) => {
 });
 
 // GET: Endpoint to retrieve all tasks for a user
-// ... 
 app.get("/tasks/:user", auth, async (req, res) => {
-  try {
-    const { user } = req.params;
-    const snapshot = await db.collection("tasks").where("user", "==", user).get();
+    const user = req.params.user;
 
-    let tasks = [];
-    snapshot.forEach((doc) => {
-      tasks.push({
-        id: doc.id,
-        ...doc.data(),
+    // Verify the user can only access their own tasks
+    if (req.token.email?.split("@")[0] !== user) {
+      return res.status(403).send({ error: "Unauthorized access" });
+    }
+
+    try {
+      const snapshot = await db.collection("tasks").where("user", "==", user).get();
+      let tasks = [];
+      snapshot.forEach((doc) => {
+        tasks.push({
+          id: doc.id,
+          ...doc.data(),
+        });
       });
-    })
 
-    res.status(200).send(tasks);
-
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-})
+      res.status(200).send(tasks);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  });
 
 // POST: Endpoint to add a new task
-// ...
-
 app.post("/tasks", async (req, res) => {
   try {
-    const newTask = {
-      user: req.body.user,
-      name: req.body.name,
-      finished: false,
-    }
-
-    const docRef = await db.collection("tasks").add(newTask);
-
-    const createdTask = {
-      id: docRef.id,
-      ...newTask,
-    }
-
-    res.status(201).send(createdTask);
+    const taskData = req.body;
+    
+    console.log("Received task data:", taskData);
+    
+    const addedTask = await db.collection("tasks").add(taskData);
+    
+    console.log("Task added with ID:", addedTask.id);
+    
+    res.status(201).send({
+      id: addedTask.id,
+      ...taskData,
+    });
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error("Error adding task:", error);
+    res.status(500).send({ error: error.message });
   }
-})
+});
 
 // DELETE: Endpoint to remove a task
-// ...
-
 app.delete("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const taskRef = db.collection("tasks").doc(id);
-    const taskSnapshot = await taskRef.get();
-
-    if (!taskSnapshot.exists) {
-      res.status(404).send({ message: "Task not found" });
-    } else {
-      await taskRef.delete();
-      res.status(200).send({ id, ...taskSnapshot.data() });
-    }
+    
+    await db.collection("tasks").doc(id).delete();
+    
+    res.status(200).send({ 
+      message: "Task deleted successfully",
+      id: id 
+    });
   } catch (error) {
     res.status(500).send(error.message);
   }
-})
+});
 
 // Setting the port for the server to listen on
 const PORT = process.env.PORT || 3001;
