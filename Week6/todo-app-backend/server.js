@@ -57,34 +57,29 @@ app.get("/tasks", async (req, res) => {
 });
 
 // GET: Endpoint to retrieve all tasks for a user
-app.get("/tasks/:userId", async (req, res) => {
-  try {
-    const { userId } = req.params;
-    console.log("Fetching tasks for user:", userId);
-    
-    // Get ALL tasks first
-    const snapshot = await db.collection("tasks").get();
-    
-    let tasks = [];
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      // Filter by user in JavaScript
-      if (data.user === userId) {
+app.get("/tasks/:user", auth, async (req, res) => {
+    const user = req.params.user;
+
+    // Verify the user can only access their own tasks
+    if (req.token.uid !== user) {
+      return res.status(403).send({ error: "Unauthorized access" });
+    }
+
+    try {
+      const snapshot = await db.collection("tasks").where("user", "==", user).get();
+      let tasks = [];
+      snapshot.forEach((doc) => {
         tasks.push({
           id: doc.id,
-          ...data,
+          ...doc.data(),
         });
-      }
-    });
-    
-    console.log(`Found ${tasks.length} tasks for user ${userId}`);
-    res.status(200).send(tasks);
-  } catch (error) {
-    console.error("Error fetching tasks:", error);
-    res.status(500).send(error.message);
-  }
-});
+      });
 
+      res.status(200).send(tasks);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  });
 // POST: Endpoint to add a new task
 app.post("/tasks", async (req, res) => {
   try {
