@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    Container,
-    Typography,
-    TextField,
-    Button,
-    List,
-    ListItem,
-    ListItemText,
-    Checkbox,
-    Box,
-    Grid,
+  Container,
+  Typography,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Checkbox,
+  Box,
+  Grid,
 } from "@mui/material";
 import Header from "./Header";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -25,32 +25,35 @@ export default function HomePage() {
   // State for the task name being entered by the user.
   const [newTaskName, setNewTaskName] = useState("");
 
-  useEffect(() => {
-      if (!currentUser) {
-          navigate("/login");
-      } else {
-          // fetch from API
-          const userId = currentUser.email || currentUser.uid;
-          currentUser.getIdToken().then((token) => {
-              fetch(`${process.env.REACT_APP_BACKEND}/tasks/${userId}`, {
-                  headers: {
-                      Authorization: `Bearer ${token}`,
-                  },
-              })
-                  .then((response) => response.json())
-                  .then((data) => setTaskList(data))
-                  .catch((error) =>
-                      console.error("Error fetching tasks:", error)
-                  );
-          });
-      }
-  }, [currentUser]);
-
   // TODO: Support retrieving your todo list from the API.
   // Currently, the tasks are hardcoded. You'll need to make an API call
   // to fetch the list of tasks instead of using the hardcoded data.
 
-  function handleAddTask() {
+  useEffect(() => {
+        if (!currentUser) {
+            navigate("/login");
+        } else {
+            const userId = currentUser.email ? currentUser.email.split('@')[0] : currentUser.uid;
+            currentUser.getIdToken().then((token) => {
+                fetch(`${process.env.REACT_APP_BACKEND}/tasks/${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                    .then((response) => response.json())
+                    .then((data) => setTaskList(data))
+                    .catch((error) =>
+                        console.error("Error fetching tasks:", error)
+                    );
+            });
+        }
+    }, [currentUser]);
+
+    // TODO: Support retrieving your todo list from the API.
+    // Currently, the tasks are hardcoded. You'll need to make an API call
+    // to fetch the list of tasks instead of using the hardcoded data.
+
+    function handleAddTask() {
       // Check if task name is provided and if it doesn't already exist.
       if (
           newTaskName &&
@@ -59,7 +62,7 @@ export default function HomePage() {
           // TODO: Support adding todo items to your todo list through the API.
           // In addition to updating the state directly, you should send a request
           // to the API to add a new task and then update the state based on the response.
-          const userId = currentUser.email || currentUser.uid;
+          const userId = currentUser.email ? currentUser.email.split('@')[0] : currentUser.uid;
           currentUser.getIdToken().then((token) => {
               fetch(`${process.env.REACT_APP_BACKEND}/tasks`, {
                   method: "POST",
@@ -85,47 +88,36 @@ export default function HomePage() {
       } else if (taskList.some((task) => task.name === newTaskName)) {
           alert("Task already exists!");
       }
-  }
+    }
 
   // Function to toggle the 'finished' status of a task.
   function toggleTaskCompletion(task) {
-      setTaskList(
-          taskList.map((t) =>
-              t.id === task.id ? { ...t, finished: !task.finished } : t
-          )
-      );
+    fetch(`${process.env.REACT_APP_BACKEND}/tasks/${task.id}`, {
+      method: "DELETE"
+  })
+    .then(response => response.json())
+    .then(() => {
+      const updatedTaskList = taskList.filter((existingTask) => existingTask.id !== task.id)
 
-      // TODO: Support removing/checking off todo items in your todo list through the API.
-      // Similar to adding tasks, when checking off a task, you should send a request
-      // to the API to update the task's status and then update the state based on the response.
-      currentUser.getIdToken().then((token) => {
-          fetch(`${process.env.REACT_APP_BACKEND}/tasks/${task.id}`, {
-              method: "DELETE",
-              headers: {
-                  Authorization: `Bearer ${token}`,
-              },
-          })
-              .then((response) => response.json())
-              .then(() => {
-                  const updatedTaskList = taskList.filter(
-                      (existingTask) => existingTask.id !== task.id
-                  );
-                  setTaskList(updatedTaskList);
-              })
-              .catch((error) => console.error("Error updating task:", error));
-      });
+      setTaskList(updatedTaskList)
+    })
+    .catch(error => {
+          console.error("FAILED TO DELETE: ", error)
+    })
+
+    // TODO: Support removing/checking off todo items in your todo list through the API.
+    // Similar to adding tasks, when checking off a task, you should send a request
+    // to the API to update the task's status and then update the state based on the response.
   }
 
   // Function to compute a message indicating how many tasks are unfinished.
   function getUnfinishedTaskMessage() {
-      const unfinishedTasks = taskList.filter(
-          (task) => !task.finished
-      ).length;
-      return unfinishedTasks === 1
-          ? `You have 1 unfinished task`
-          : `You have ${unfinishedTasks} tasks left to do`;
+    const unfinishedTasks = taskList.filter((task) => !task.finished).length;
+    return unfinishedTasks === 1
+      ? `You have 1 unfinished task`
+      : `You have ${unfinishedTasks} tasks left to do`;
   }
-  
+
   return (
     <>
       <Header />
