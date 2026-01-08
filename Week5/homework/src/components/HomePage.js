@@ -33,7 +33,7 @@ export default function HomePage() {
     if (!currentUser) {
       navigate("/login");
     } else {
-      fetch(`process.env.REACT_APP_BACKEND/tasks/${currentUser}`)
+      fetch(`${process.env.REACT_APP_BACKEND}/tasks/${currentUser}`)
         .then((response) => response.json())
         .then((data) => {
           setTaskList(data);
@@ -52,7 +52,7 @@ export default function HomePage() {
       // In addition to updating the state directly, you should send a request
       // to the API to add a new task and then update the state based on the response.
       
-      fetch("process.env.REACT_APP_BACKEND/tasks", {
+      fetch(`${process.env.REACT_APP_BACKEND}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -78,7 +78,7 @@ export default function HomePage() {
 
   // Function to toggle the 'finished' status of a task.
   function toggleTaskCompletion(task) {
-    fetch(`process.env.REACT_APP_BACKEND/tasks/${task.id}`, {
+    fetch(`${process.env.REACT_APP_BACKEND}/tasks/${task.id}`, {
       method: "DELETE"
   })
     .then(response => response.json())
