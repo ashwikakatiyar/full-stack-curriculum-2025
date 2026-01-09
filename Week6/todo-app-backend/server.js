@@ -62,23 +62,26 @@ app.get("/tasks", async (req, res) => {
 });
 
 // GET: Endpoint to retrieve all tasks for a user
-app.get("/tasks/:user", auth, async (req, res) => {
-    try {
-      const user = req.params.user;
-      const snapshot = await db.collection("tasks").where("user", "==", user).get();
-      let tasks = [];
-      snapshot.forEach((doc) => {
-        tasks.push({
-          id: doc.id,
-          ...doc.data(),
-        });
-      });
+app.get("/tasks", auth, async (req, res) => {
+  try {
+    const user = req.token.uid; // from Firebase token
 
-      res.status(200).send(tasks);
-    } catch (error) {
-      res.status(500).send(error.message);
-    }
-  });
+    const snapshot = await db
+      .collection("tasks")
+      .where("user", "==", user)
+      .get();
+
+    let tasks = [];
+    snapshot.forEach((doc) => {
+      tasks.push({ id: doc.id, ...doc.data() });
+    });
+
+    res.status(200).send(tasks);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
 
 // POST: Endpoint to add a new task
 app.post("/tasks", async (req, res) => {
