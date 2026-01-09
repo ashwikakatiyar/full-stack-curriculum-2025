@@ -73,9 +73,10 @@ app.get("/tasks/:user", auth, async (req, res) => {
     const user = req.params.user;
 
     // Verify the user can only access their own tasks
-    if (req.token.email?.split("@")[0] !== user) {
+    if (req.token.uid !== user) {
       return res.status(403).send({ error: "Unauthorized access" });
     }
+
 
     try {
       const snapshot = await db.collection("tasks").where("user", "==", user).get();
@@ -96,23 +97,24 @@ app.get("/tasks/:user", auth, async (req, res) => {
 // POST: Endpoint to add a new task
 app.post("/tasks", async (req, res) => {
   try {
-    const taskData = req.body;
-    
-    console.log("Received task data:", taskData);
-    
-    const addedTask = await db.collection("tasks").add(taskData);
-    
-    console.log("Task added with ID:", addedTask.id);
-    
-    res.status(201).send({
-      id: addedTask.id,
-      ...taskData,
-    });
+    const newTask = {
+      user: req.body.user,
+      name: req.body.name,
+      finished: false,
+    }
+
+    const docRef = await db.collection("tasks").add(newTask);
+
+    const createdTask = {
+      id: docRef.id,
+      ...newTask,
+    }
+
+    res.status(201).send(createdTask);
   } catch (error) {
-    console.error("Error adding task:", error);
-    res.status(500).send({ error: error.message });
+    res.status(500).send(error.message);
   }
-});
+})
 
 // DELETE: Endpoint to remove a task
 app.delete("/tasks/:id", async (req, res) => {
