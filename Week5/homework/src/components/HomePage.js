@@ -33,7 +33,7 @@ export default function HomePage() {
         if (!currentUser) {
             navigate("/login");
         } else {
-            const userId = currentUser.uid;
+            const userId = currentUser.email || currentUser.uid;
             currentUser.getIdToken().then((token) => {
                 fetch(`${process.env.REACT_APP_BACKEND}/tasks/${userId}`, {
                     headers: {
@@ -62,7 +62,7 @@ export default function HomePage() {
           // TODO: Support adding todo items to your todo list through the API.
           // In addition to updating the state directly, you should send a request
           // to the API to add a new task and then update the state based on the response.
-          const userId = currentUser.uid;
+          const userId = currentUser.email || currentUser.uid;
           currentUser.getIdToken().then((token) => {
               fetch(`${process.env.REACT_APP_BACKEND}/tasks`, {
                   method: "POST",
@@ -92,22 +92,31 @@ export default function HomePage() {
 
   // Function to toggle the 'finished' status of a task.
   function toggleTaskCompletion(task) {
-    fetch(`${process.env.REACT_APP_BACKEND}/tasks/${task.id}`, {
-      method: "DELETE"
-  })
-    .then(response => response.json())
-    .then(() => {
-      const updatedTaskList = taskList.filter((existingTask) => existingTask.id !== task.id)
-
-      setTaskList(updatedTaskList)
-    })
-    .catch(error => {
-          console.error("FAILED TO DELETE: ", error)
-    })
+    setTaskList(
+        taskList.map((t) =>
+            t.id === task.id ? { ...t, finished: !task.finished } : t
+        )
+    );
 
     // TODO: Support removing/checking off todo items in your todo list through the API.
     // Similar to adding tasks, when checking off a task, you should send a request
     // to the API to update the task's status and then update the state based on the response.
+    currentUser.getIdToken().then((token) => {
+        fetch(`${process.env.REACT_APP_BACKEND}/tasks/${task.id}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+            .then((response) => response.json())
+            .then(() => {
+                const updatedTaskList = taskList.filter(
+                    (existingTask) => existingTask.id !== task.id
+                );
+                setTaskList(updatedTaskList);
+            })
+            .catch((error) => console.error("Error updating task:", error));
+    });
   }
 
   // Function to compute a message indicating how many tasks are unfinished.

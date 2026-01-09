@@ -12,19 +12,12 @@ require("dotenv").config();
 
 // Importing the Firestore database instance from firebase.js
 const db = require("./firebase");
-const corsOptions = {
-  origin: [
-    'http://localhost:3001',  // Local development
-    'https://todo-app-frontend-taupe.vercel.app',  // Your frontend URL
-  ],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
+const { admin } = require("./firebase");
 
 
 //middleware
-app.use(cors(corsOptions));
-app.use(express.json()); // Parse JSON body
+app.use(cors());
+app.use(bodyParser.json());
 
 // Firebase Admin Authentication Middleware
 const auth = (req, res, next) => {
@@ -70,15 +63,8 @@ app.get("/tasks", async (req, res) => {
 
 // GET: Endpoint to retrieve all tasks for a user
 app.get("/tasks/:user", auth, async (req, res) => {
-    const user = req.params.user;
-
-    // Verify the user can only access their own tasks
-    if (req.token.uid !== user) {
-      return res.status(403).send({ error: "Unauthorized access" });
-    }
-
-
     try {
+      const user = req.params.user;
       const snapshot = await db.collection("tasks").where("user", "==", user).get();
       let tasks = [];
       snapshot.forEach((doc) => {
@@ -120,13 +106,15 @@ app.post("/tasks", async (req, res) => {
 app.delete("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    
-    await db.collection("tasks").doc(id).delete();
-    
-    res.status(200).send({ 
-      message: "Task deleted successfully",
-      id: id 
-    });
+    const taskRef = db.collection("tasks").doc(id);
+    const taskSnapshot = await taskRef.get();
+
+    if (!taskSnapshot.exists) {
+      res.status(404).send({ message: "Task not found" });
+    } else {
+      await taskRef.delete();
+      res.status(200).send({ id, ...taskSnapshot.data() });
+    }
   } catch (error) {
     res.status(500).send(error.message);
   }
