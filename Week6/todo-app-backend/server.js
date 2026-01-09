@@ -39,7 +39,7 @@ const auth = (req, res, next) => {
 // Your API routes will go here...
 
 // GET: Endpoint to retrieve all tasks
-app.get("/", async (req, res) => {
+app.get("/tasks", async (req, res) => {
   try {
     // Fetching all documents from the "tasks" collection in Firestore
     const snapshot = await db.collection("tasks").get();
@@ -62,21 +62,21 @@ app.get("/", async (req, res) => {
 });
 
 // GET: Endpoint to retrieve all tasks for a user
-app.get("/tasks", auth, async (req, res) => {
+app.get("/tasks/:user", async (req, res) => {
   try {
-    const userId = req.token.uid;
+    const { user } = req.params;
+    const snapshot = await db.collection("tasks").where("user", "==", user).get();
+    
+    let tasks = [];
 
-    const snapshot = await db
-      .collection("tasks")
-      .where("user", "==", userId)
-      .get();
-
-    const tasks = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    res.status(200).json(tasks);
+    snapshot.forEach((doc) => {
+      tasks.push({
+        id: doc.id,  
+        ...doc.data(),  
+      });
+    });
+    
+    res.status(200).send(tasks);
   } catch (error) {
     res.status(500).send(error.message);
   }
