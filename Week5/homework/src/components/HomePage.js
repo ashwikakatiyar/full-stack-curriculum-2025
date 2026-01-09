@@ -34,16 +34,16 @@ export default function HomePage() {
             navigate("/login");
         } else {
             currentUser.getIdToken().then((token) => {
-                fetch(`${process.env.REACT_APP_BACKEND}/tasks/${currentUser.uid}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                fetch(`${process.env.REACT_APP_BACKEND}/tasks`, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
                 })
-                    .then((response) => response.json())
-                    .then((data) => setTaskList(data))
-                    .catch((error) =>
-                        console.error("Error fetching tasks:", error)
-                    );
+                .then((response) => response.json())
+                .then((data) => setTaskList(data))
+                .catch((error) =>
+                    console.error("Error fetching tasks:", error)
+                );
             });
         }
     }, [currentUser]);

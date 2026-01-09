@@ -62,7 +62,7 @@ app.get("/", async (req, res) => {
 });
 
 // GET: Endpoint to retrieve all tasks for a user
-app.get("/tasks/:user", auth, async (req, res) => {
+app.get("/tasks", auth, async (req, res) => {
   try {
     const userId = req.token.uid;
 
