@@ -34,7 +34,6 @@ export default function HomePage() {
             navigate("/login");
         } else {
             currentUser.getIdToken().then((token) => {
-              console.log("BACKEND URL:", process.env.REACT_APP_BACKEND);
                 fetch(`${process.env.REACT_APP_BACKEND}/tasks`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
