@@ -38,29 +38,8 @@ const auth = (req, res, next) => {
 
 // Your API routes will go here...
 
-
-app.get("/", auth, async (req, res) => {
-  try {
-    const userId = req.token.uid;
-
-    const snapshot = await db
-      .collection("tasks")
-      .where("user", "==", userId)
-      .get();
-
-    const tasks = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    res.status(200).json(tasks);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-
 // GET: Endpoint to retrieve all tasks
-app.get("/tasks/:user", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
     // Fetching all documents from the "tasks" collection in Firestore
     const snapshot = await db.collection("tasks").get();
@@ -83,6 +62,25 @@ app.get("/tasks/:user", async (req, res) => {
 });
 
 // GET: Endpoint to retrieve all tasks for a user
+app.get("/tasks/:user", auth, async (req, res) => {
+  try {
+    const userId = req.token.uid;
+
+    const snapshot = await db
+      .collection("tasks")
+      .where("user", "==", userId)
+      .get();
+
+    const tasks = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).json(tasks);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 
 // POST: Endpoint to add a new task
