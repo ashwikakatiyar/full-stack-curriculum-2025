@@ -33,9 +33,8 @@ export default function HomePage() {
         if (!currentUser) {
             navigate("/login");
         } else {
-            const userId = currentUser.email || currentUser.uid;
             currentUser.getIdToken().then((token) => {
-                fetch(`${process.env.REACT_APP_BACKEND}/tasks/${userId}`, {
+                fetch(`${process.env.REACT_APP_BACKEND}/tasks/${currentUser.uid}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -62,7 +61,6 @@ export default function HomePage() {
           // TODO: Support adding todo items to your todo list through the API.
           // In addition to updating the state directly, you should send a request
           // to the API to add a new task and then update the state based on the response.
-          const userId = currentUser.email || currentUser.uid;
           currentUser.getIdToken().then((token) => {
               fetch(`${process.env.REACT_APP_BACKEND}/tasks`, {
                   method: "POST",
@@ -71,7 +69,7 @@ export default function HomePage() {
                       Authorization: `Bearer ${token}`,
                   },
                   body: JSON.stringify({
-                      user: userId,
+                      user: currentUser.uid,
                       name: newTaskName,
                       finished: false,
                   }),
