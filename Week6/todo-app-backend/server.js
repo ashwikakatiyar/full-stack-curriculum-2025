@@ -38,6 +38,28 @@ const auth = (req, res, next) => {
 
 // Your API routes will go here...
 
+// GET: Endpoint to retrieve all tasks for a user
+app.get("/tasks", auth, async (req, res) => {
+  try {
+    const userId = req.token.uid;
+
+    const snapshot = await db
+      .collection("tasks")
+      .where("user", "==", userId)
+      .get();
+
+    const tasks = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).json(tasks);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+
 // GET: Endpoint to retrieve all tasks
 app.get("/tasks", async (req, res) => {
   try {
@@ -57,27 +79,6 @@ app.get("/tasks", async (req, res) => {
     res.status(200).send(tasks);
   } catch (error) {
     // Sending an error response in case of an exception
-    res.status(500).send(error.message);
-  }
-});
-
-// GET: Endpoint to retrieve all tasks for a user
-app.get("/tasks", auth, async (req, res) => {
-  try {
-    const user = req.token.uid; // from Firebase token
-
-    const snapshot = await db
-      .collection("tasks")
-      .where("user", "==", user)
-      .get();
-
-    let tasks = [];
-    snapshot.forEach((doc) => {
-      tasks.push({ id: doc.id, ...doc.data() });
-    });
-
-    res.status(200).send(tasks);
-  } catch (error) {
     res.status(500).send(error.message);
   }
 });
